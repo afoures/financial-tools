@@ -192,7 +192,10 @@ function Results() {
                 investments={investments}
                 repartition={repartition}
             />
-            <div className={style.block}>
+            <div className={style.main}>
+                <div className={style.informations}>
+                    <p>Target = ({config.goal.amount} / {1 - config.avgTaxRate}) / {config.goal.wr} = {target.toFixed(2)}</p>
+                </div>
                 <Charts.Retirement
                     boundaries={boundaries}
                     balance={balance}

@@ -34,21 +34,21 @@ function Basic() {
         >
             <InputGroup
                 name='stockReturns'
-                label='Annual Stock Returns'
+                label='Rendement annuel des Actions'
                 value={config.stockReturns}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.stockReturns}
             />
             <InputGroup
                 name='bondReturns'
-                label='Annual Bond Returns'
+                label='Rendement annuel des Obligations'
                 value={config.bondReturns}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.bondReturns}
             />
             <InputGroup
                 name='avgTaxRate'
-                label='Average Tax Rate'
+                label="Taux d'imposition sur plus-values"
                 value={config.avgTaxRate}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.avgTaxRate}
@@ -57,7 +57,7 @@ function Basic() {
     )
 }
 
-function DynamicGroup({ name, dataKey }) {
+function DynamicGroup({ name, title, dataKey }) {
     const { register, handleSubmit, errors, reset } = useForm()
     const { config, updateConfig } = useConfig()
 
@@ -83,7 +83,7 @@ function DynamicGroup({ name, dataKey }) {
     return (
         <div className={styles['dynamic-group']}>
             <h3>
-                {name}
+                {title}
             </h3>
             <div className={styles['dynamic-list']}>
                 <div className={styles.header}>
@@ -195,17 +195,17 @@ function Dynamic() {
     return (
         <div className={styles.dynamic}>
             <DynamicGroup
-                title='Investments'
+                title='Investissements'
                 name='investments'
                 dataKey='amount'
             />
             <DynamicGroup
-                title='Income'
+                title='Revenus'
                 name='income'
                 dataKey='amount'
             />
             <DynamicGroup
-                title='Spending'
+                title='Dépenses'
                 name='spending'
                 dataKey='amount'
             />
@@ -229,14 +229,14 @@ function Goal() {
         >
             <InputGroup
                 name='amount'
-                label='Goal'
+                label='Dépenses liées à la retraite'
                 value={config.goal.amount}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.amount}
             />
             <InputGroup
                 name='wr'
-                label='Safe Withdrawal Rate'
+                label='Taux de retrait sécurisé'
                 value={config.goal.wr}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.wr}
