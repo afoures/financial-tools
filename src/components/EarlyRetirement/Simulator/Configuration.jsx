@@ -124,7 +124,7 @@ function DynamicPortfolio() {
 
     const isOne = () => {
         const values = getValues()
-        return (Number(values.stock) + Number(values.bond)) === 1
+        return (Number(values.stock) + Number(values.bond) + Number(values.cash)) === 1
     }
 
     const removeElem = (id) => {
@@ -143,6 +143,7 @@ function DynamicPortfolio() {
             repartition: {
                 stock: elem.stock,
                 bond: elem.bond,
+                cash: elem.cash,
             }
         }
         setList(list => [...list, newElem])
@@ -161,7 +162,7 @@ function DynamicPortfolio() {
             <div className={styles['dynamic-list']}>
                 <div className={styles.header}>
                     <span className={styles['key-title']}>age</span>
-                    <span className={styles['value-title']}>{['stock', 'bond'].join(' - ')}</span>
+                    <span className={styles['value-title']}>{['stock', 'bond', 'cash'].join('  -  ')}</span>
                 </div>
                 {list.map((item, index) =>
                     <div
@@ -169,7 +170,7 @@ function DynamicPortfolio() {
                         key={index}
                     >
                         <span className={styles.key}>{item.age}</span>
-                        <span className={styles.value}>{`${item.repartition.stock} - ${item.repartition.bond}`}</span>
+                        <span className={styles.value}>{`${item.repartition.stock} - ${item.repartition.bond} - ${item.repartition.cash}`}</span>
                         <span
                             onClick={() => removeElem(index)}
                             className={styles.remove}
@@ -184,6 +185,7 @@ function DynamicPortfolio() {
                 <input className={errors.age && styles.error} name="age" placeholder="age" ref={register({required: true, validate: isNumber})} />
                 <input className={errors.stock && styles.error} name="stock" placeholder="stock" ref={register({required: true, validate: {isNumber, isOne}})} />
                 <input className={errors.bond && styles.error} name="bond" placeholder="bond" ref={register({required: true, validate: {isNumber, isOne}})} />
+                <input className={errors.cash && styles.error} name="cash" placeholder="cash" ref={register({required: true, validate: {isNumber, isOne}})} />
                 <button type='submit' >add</button>
             </form>
         </div>
@@ -195,11 +197,6 @@ function Dynamic() {
     return (
         <div className={styles.dynamic}>
             <DynamicGroup
-                title='Investissements'
-                name='investments'
-                dataKey='amount'
-            />
-            <DynamicGroup
                 title='Revenus'
                 name='income'
                 dataKey='amount'
@@ -207,6 +204,11 @@ function Dynamic() {
             <DynamicGroup
                 title='Dépenses'
                 name='spending'
+                dataKey='amount'
+            />
+            <DynamicGroup
+                title='Investissements'
+                name='investments'
                 dataKey='amount'
             />
             <DynamicPortfolio />

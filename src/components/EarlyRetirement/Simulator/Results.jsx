@@ -13,8 +13,6 @@ const getBoundaries = (config) => {
     const max = 80
     let min = max
 
-    console.log(config)
-
     config.income.forEach((elem) => {
         if ( elem.age < min) min = elem.age
     })
@@ -67,7 +65,7 @@ const computeRepartition = (boundaries, data) => {
 }
 
 const computeSavings = (income, spending) => {
-    return income.map((amount, index) => amount - spending[index])
+    return income.map((amount, index) => Math.max(0, amount - spending[index]))
 }
 
 
@@ -137,8 +135,6 @@ function simulate(config) {
 
     const boundaries = getBoundaries(config)
 
-    console.log(boundaries)
-
     const [income, spending, investments, repartition] = [
         computeInformations(boundaries, config.income),
         computeInformations(boundaries, config.spending),
@@ -154,8 +150,6 @@ function simulate(config) {
         stock: config.stockReturns,
         bond: config.bondReturns,
     }, investments, savings, repartition)
-
-    console.log(balance)
 
     return {
         boundaries,

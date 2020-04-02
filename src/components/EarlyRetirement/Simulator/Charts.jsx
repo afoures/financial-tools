@@ -40,7 +40,7 @@ export function Summary({ boundaries, income, spending, investments, repartition
     return (
         <div>
             <h2>
-                Summary
+                Situation
             </h2>
             <AreaChart
                 width={320}
