@@ -1,0 +1,17 @@
+@import '../../../styles/variables';
+
+.results {
+    width: 100%;
+    padding: 16px 8px;
+    box-sizing: border-box;
+    display: flex;
+
+    .block {
+        flex: 1 1 auto;
+        margin-left: 16px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        border-left: 2px solid $item-color;
+    }
+}

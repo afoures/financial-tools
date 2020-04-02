@@ -1,0 +1,46 @@
+@import "./styles/variables";
+
+body {
+  margin: 0;
+  padding: 0;
+  background: $bg;
+  color: $font-color;
+  overflow-y: scroll;
+  font-size: 14px;
+  font-family: Apple-System,Arial,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,STXihei,sans-serif;
+
+  .app {
+    position: relative;
+    margin: 40px auto;
+    width: 1024px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @media (max-width: 1088px) {
+      width: 95%;
+    }
+
+    main {
+        margin: 16px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        box-sizing: border-box;
+
+        article {
+            flex: 1 1 auto;
+            padding: 16px;
+        }
+
+        aside {
+            flex: 0 0 192px;
+            height: 352px;
+            padding: 16px;
+            box-sizing: border-box;
+            border: 2px solid $item-color;
+            border-radius: 4px;
+        }
+    }
+  }
+}

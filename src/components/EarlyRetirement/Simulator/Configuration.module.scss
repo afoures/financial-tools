@@ -1,0 +1,145 @@
+@import '../../../styles/variables';
+
+.configuration {
+    width: 100%;
+    padding: 8px;
+    background-color: $item-color;
+    box-sizing: border-box;
+    border-radius: 4px;
+
+    label {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    input {
+        height: 30px;
+        width: 64px;
+        padding: 8px;
+        background: $input-color;
+        border: 1px solid $input-color;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+        color: $font-color;
+        outline: none;
+
+        &.error {
+            border: 1px solid $red;
+        }
+    }
+
+    .basic, .dynamic {
+        border-bottom: 1px solid $bg;
+    }
+
+    .basic, .goal, .dynamic {
+        margin: 0 8px;
+        padding: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+
+        .input-group {
+            margin: 8px 16px;
+        }
+    }
+
+    .dynamic {
+        justify-content: space-around;
+        flex-wrap: wrap;
+
+        .dynamic-group, .dynamic-portfolio {
+            margin: 8px 16px;
+            width: 224px;
+            box-sizing: border-box;
+
+            h3 {
+                margin: 12px 0;
+                text-transform: capitalize;
+                box-sizing: border-box;
+            }
+
+            .dynamic-list {
+                width: 100%;
+                box-sizing: border-box;
+
+                .header {
+                    margin: 8px 0;
+                    padding: 4px 8px;
+                    display: flex;
+                    align-items: baseline;
+                    opacity: 0.5;
+
+                    .key-title {
+                        flex: none;
+                        padding: 0 12px;
+                        text-transform: capitalize;
+                    }
+
+                    .value-title {
+                        flex: 1 1 auto;
+                        text-align: center;
+                        padding: 0 38px 0 12px;
+                        text-transform: capitalize;
+                    }
+                }
+
+                .item {
+                    margin: 8px 0;
+                    padding: 12px 8px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    line-height: 0;
+                    font-size: 16px;
+                    background-color: $bg;
+                    box-sizing: border-box;
+                    border-radius: 4px;
+
+                    .key {
+                        padding: 0 16px;
+                        font-weight: bold;
+                    }
+
+                    .value {
+                        padding: 0 8px;
+                    }
+
+                    .remove {
+                        padding: 0 6px;
+                        font-size: 32px;
+                        color: $red;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .add-item {
+                width: 100%;
+                padding: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                box-sizing: border-box;
+
+                button {
+                    padding: 4px 8px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
+        }
+
+        .dynamic-portfolio {
+            width: 320px;
+        }
+
+    }
+}
