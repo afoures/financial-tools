@@ -21,7 +21,7 @@
             background-color: $item-color;
             border-radius: 4px;
 
-            p {
+            &>p {
                 text-align: center;
                 font-size: 18px;
                 font-weight: 600;

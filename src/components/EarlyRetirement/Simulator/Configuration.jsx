@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { useConfig } from './SimulatorContext'
 
 import styles from './Configuration.module.scss'
+
+import Helper from '../../Helper'
+
+
+
 
 const castForm = (form, cast) => Object.keys(form).reduce((castedForm, key) => {
     castedForm[key] = cast(form[key])
@@ -12,10 +16,29 @@ const castForm = (form, cast) => Object.keys(form).reduce((castedForm, key) => {
 
 const isNumber = (value) => !isNaN(Number(value))
 
-const InputGroup = ({ name, label, value, registered, error }) => (
+
+
+
+
+
+const InputGroup = ({ name, label, value, registered, error, helper }) => (
     <div className={styles['input-group']}>
-        <label htmlFor={name} >{label}</label>
-        <input className={error && styles.error} name={name} defaultValue={value} ref={registered}/>
+        <label
+            htmlFor={name}
+        >
+            {label}
+        </label>
+        { helper &&
+            <Helper title={label} id={name} >
+                {helper}
+            </Helper>
+        }
+        <input
+            className={error && styles.error}
+            name={name}
+            defaultValue={value}
+            ref={registered}
+        />
     </div>
 )
 
@@ -34,17 +57,31 @@ function Basic() {
         >
             <InputGroup
                 name='stockReturns'
-                label='Rendement annuel des Actions'
+                label='Rendement annuel des actions'
                 value={config.stockReturns}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.stockReturns}
+                helper={
+                    <p>
+                        Entrez les rendements réels des actions.
+                        Le rendement boursier moyen au cours 
+                        des 150 dernières années était d'environ 8,1%.
+                    </p>
+                }
             />
             <InputGroup
                 name='bondReturns'
-                label='Rendement annuel des Obligations'
+                label='Rendement annuel des obligations'
                 value={config.bondReturns}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.bondReturns}
+                helper={
+                    <p>
+                        Entrez les rendements réels des obligations.
+                        Le rendement moyen des titres à revenu fixe au cours 
+                        des 150 dernières années était d'environ 2,4 %.
+                    </p>
+                }
             />
             <InputGroup
                 name='avgTaxRate'
@@ -52,53 +89,77 @@ function Basic() {
                 value={config.avgTaxRate}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.avgTaxRate}
+                helper={
+                    <p>
+                        Indiquez votre taux d'imposition moyen 
+                        . Les impôts ne sont appliqués que lors 
+                        de la vente d'actifs. Ce taux gonflera 
+                        le montant que vous devrez retirer 
+                        annuellement de votre patrimoine boursier.
+                    </p>
+                }
             />
         </form>
     )
 }
 
-function DynamicGroup({ name, title, dataKey }) {
+
+
+
+const byAge = (a, b) => Number(a.age) - Number(b.age)
+
+
+
+
+function ListGroup({ name, title, inputs = [], helper }) {
     const { register, handleSubmit, errors, reset } = useForm()
     const { config, updateConfig } = useConfig()
 
     const [list, setList] = useState(config[name])
 
-    const removeElem = (id) => {
-        setList(list => {
-            const copy = [...list]
-            copy.splice(id, 1)
-            return copy
-        })
-    }
+    const removeFromList = id => setList(current => {
+        const list = [...current]
+        list.splice(id, 1)
+        return list
+    })
 
-    const addElem = (elem) => {
-        setList(list => [...list, castForm(elem, Number)])
-        reset()
-    }
+    const addToList = item => setList(current => [
+        ...current,
+        castForm(item, Number)
+    ].sort(byAge))
 
-    useEffect(() => {
-        updateConfig(config => ({...config, [name]: list}))
-    }, [list, name, updateConfig])
+
+    useEffect(() => updateConfig(config => ({
+        ...config,
+        [name]: list,
+    })), [list, name, updateConfig])
 
     return (
-        <div className={styles['dynamic-group']}>
+        <div className={styles['list-group']} >
             <h3>
                 {title}
+                { helper &&
+                    <Helper title={title} id={name} >
+                        {helper}
+                    </Helper>
+                }
             </h3>
-            <div className={styles['dynamic-list']}>
+            <div className={styles.list}>
                 <div className={styles.header}>
-                    <span className={styles['key-title']}>age</span>
-                    <span className={styles['value-title']}>{dataKey}</span>
+                    {inputs.map((input, index) =>
+                        <span key={index}>{input.placeholder}</span>
+                    )}
                 </div>
                 {list.map((item, index) =>
                     <div
                         className={styles.item}
                         key={index}
                     >
-                        <span className={styles.key}>{item.age}</span>
-                        <span className={styles.value}>{item[dataKey]}</span>
+                        {inputs.map((input, index) =>
+                            <span key={index}>{item[input.name]}</span>
+                        )}
                         <span
-                            onClick={() => removeElem(index)}
+                            onClick={() => removeFromList(index)}
                             className={styles.remove}
                         >⨯</span>
                     </div>
@@ -106,87 +167,18 @@ function DynamicGroup({ name, title, dataKey }) {
             </div>
             <form
                 className={styles['add-item']}
-                onSubmit={handleSubmit(addElem)}
+                onSubmit={handleSubmit(addToList)}
             >
-                <input className={errors.age && styles.error} name="age" placeholder="age" ref={register({required: true, validate: isNumber})} />
-                <input className={errors[dataKey] && styles.error} name={dataKey} placeholder={dataKey} ref={register({required: true, validate: isNumber})} />
-                <button type='submit' >add</button>
-            </form>
-        </div>
-    )
-}
-
-function DynamicPortfolio() {
-    const { register, handleSubmit, getValues, errors, reset } = useForm()
-    const { config, updateConfig } = useConfig()
-
-    const [list, setList] = useState(config.portfolio)
-
-    const isOne = () => {
-        const values = getValues()
-        return (Number(values.stock) + Number(values.bond) + Number(values.cash)) === 1
-    }
-
-    const removeElem = (id) => {
-        setList(list => {
-            const copy = [...list]
-            copy.splice(id, 1)
-            return copy
-        })
-    }
-
-    const addElem = (form) => {
-        const elem = castForm(form, Number)
-
-        const newElem = {
-            age: elem.age,
-            repartition: {
-                stock: elem.stock,
-                bond: elem.bond,
-                cash: elem.cash,
-            }
-        }
-        setList(list => [...list, newElem])
-        reset()
-    }
-
-    useEffect(() => {
-        updateConfig(config => ({...config, portfolio: list}))
-    }, [list, updateConfig])
-
-    return (
-        <div className={styles['dynamic-portfolio']}>
-            <h3>
-                portfolio
-            </h3>
-            <div className={styles['dynamic-list']}>
-                <div className={styles.header}>
-                    <span className={styles['key-title']}>age</span>
-                    <span className={styles['value-title']}>{['stock', 'bond', 'cash'].join('  -  ')}</span>
-                </div>
-                {list.map((item, index) =>
-                    <div
-                        className={styles.item}
+                {inputs.map((input, index) =>
+                    <input
                         key={index}
-                    >
-                        <span className={styles.key}>{item.age}</span>
-                        <span className={styles.value}>{`${item.repartition.stock} - ${item.repartition.bond} - ${item.repartition.cash}`}</span>
-                        <span
-                            onClick={() => removeElem(index)}
-                            className={styles.remove}
-                        >⨯</span>
-                    </div>
+                        className={errors[input.name] && styles.error}
+                        name={input.name}
+                        placeholder={input.placeholder}
+                        ref={register({ required: true, validate: input.validation })}
+                    />
                 )}
-            </div>
-            <form
-                className={styles['add-item']}
-                onSubmit={handleSubmit(addElem)}
-            >
-                <input className={errors.age && styles.error} name="age" placeholder="age" ref={register({required: true, validate: isNumber})} />
-                <input className={errors.stock && styles.error} name="stock" placeholder="stock" ref={register({required: true, validate: {isNumber, isOne}})} />
-                <input className={errors.bond && styles.error} name="bond" placeholder="bond" ref={register({required: true, validate: {isNumber, isOne}})} />
-                <input className={errors.cash && styles.error} name="cash" placeholder="cash" ref={register({required: true, validate: {isNumber, isOne}})} />
-                <button type='submit' >add</button>
+                <button type='submit' >Ajouter</button>
             </form>
         </div>
     )
@@ -196,22 +188,45 @@ function DynamicPortfolio() {
 function Dynamic() {
     return (
         <div className={styles.dynamic}>
-            <DynamicGroup
-                title='Revenus'
+            <ListGroup
+                title='Revenus réguliers'
                 name='income'
-                dataKey='amount'
+                inputs={[
+                    {name: 'age', placeholder: 'age', validation: { isNumber }},
+                    {name: 'amount', placeholder: 'montant', validation: { isNumber }},
+                ]}
             />
-            <DynamicGroup
-                title='Dépenses'
+            <ListGroup
+                title='Dépenses régulières'
                 name='spending'
-                dataKey='amount'
+                inputs={[
+                    {name: 'age', placeholder: 'age', validation: { isNumber }},
+                    {name: 'amount', placeholder: 'montant', validation: { isNumber }},
+                ]}
             />
-            <DynamicGroup
-                title='Investissements'
+            <ListGroup
+                title='Investissements irréguliers'
                 name='investments'
-                dataKey='amount'
+                inputs={[
+                    {name: 'age', placeholder: 'age', validation: { isNumber }},
+                    {name: 'amount', placeholder: 'montant', validation: { isNumber }},
+                ]}
             />
-            <DynamicPortfolio />
+            <ListGroup
+                title='Répartition des actifs'
+                name='portfolio'
+                inputs={[
+                    {name: 'age', placeholder: 'age', validation: { isNumber }},
+                    {name: 'stock', placeholder: 'action', validation: { isNumber }},
+                    {name: 'bond', placeholder: 'obligation', validation: { isNumber }},
+                    // {name: 'cash', placeholder: 'cash', validation: { isNumber }},
+                ]}
+                helper={
+                    <p>
+                        Indiquez la repartition en pourcentage cible des actifs de votre portfolio.
+                    </p>
+                }
+            />
         </div>
     )
 }
@@ -235,6 +250,14 @@ function Goal() {
                 value={config.goal.amount}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.amount}
+                helper={
+                    <p>
+                        Indiquez le montant que vous prévoyez de dépenser 
+                        annuellement pendant la retraite. N'oubliez pas 
+                        que vous devrez peut-être payer des frais de santé 
+                        supplémentaires une fois que vous aurez cessé de travailler.
+                    </p>
+                }
             />
             <InputGroup
                 name='wr'
@@ -242,6 +265,26 @@ function Goal() {
                 value={config.goal.wr}
                 registered={register({ required: true, validate: isNumber })}
                 error={errors.wr}
+                helper={
+                    <>
+                    <p>
+                        Le taux de retrait sécurisé est le pourcentage de 
+                        l'argent de votre retraite que vous prévoyez de 
+                        liquider et de dépenser chaque année à partir de 
+                        votre épargne. Il est calculé à partir de la valeur 
+                        de votre épargne au moment de votre départ à la 
+                        retraite. 4 % est généralement considéré comme un 
+                        montant sûr pour une retraite de plus de 30 ans 
+                        et vous oblige à économiser 25 fois les dépenses prévues.
+                    </p>
+                    <p>
+                        Les taux de retrait inférieurs (2 à 3 %) sont 
+                        généralement considérés comme très sûrs et beaucoup 
+                        plus prudents, mais ils vous obligent à épargner 
+                        beaucoup plus d'argent pour la retraite.
+                    </p>
+                    </>
+                }
             />
         </form>
     )

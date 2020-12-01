@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react'
 
+import Helper from '../../Helper'
+
 import {
     ResponsiveContainer,
     ComposedChart,
@@ -14,7 +16,14 @@ import {
     Tooltip
 } from 'recharts'
 
-export function Summary({ boundaries, income, spending, investments, repartition }) {
+export function Summary({ boundaries, income, spending, investments, savings, repartition }) {
+    const savingsSummary = useMemo(() => {
+        return savings.map((amount, index) => ({
+            age: boundaries.min + index,
+            saved: amount,
+        }))
+    }, [savings, boundaries])
+
     const investmentsSummary = useMemo(() => {
         return investments.map((amount, index) => ({
             age: boundaries.min + index,
@@ -41,7 +50,55 @@ export function Summary({ boundaries, income, spending, investments, repartition
         <div>
             <h2>
                 Situation
+                <Helper title='Situation' id='summary'>
+                    <p>
+                        Ces graphiques résument la situation 
+                        simulée en fonction des valeurs 
+                        présentes plus haut.
+                    </p>
+                    <p>
+                        Le premier montre le montant calculé 
+                        en tant qu'epargne régulière chaque année.
+                    </p>
+                    <p>
+                        Le deuxième permet de voir les montants 
+                        d'investissement irréguliers pour chaque 
+                        année de la simulation.
+                    </p>
+                    <p>
+                        Le troisième compare les revenus reguliers 
+                        et les dépenses regulières.
+                    </p>
+                    <p>
+                        Le dernier montre l'évolution de la repartition 
+                        des actifs du portefeuille boursier.
+                    </p>
+                </Helper>
             </h2>
+            <BarChart
+                width={320}
+                height={160}
+                data={savingsSummary}
+                syncId="summary"
+            >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Bar dataKey="saved" fill="#fdad5c" />
+            </BarChart>
+            <BarChart
+                width={320}
+                height={160}
+                data={investmentsSummary}
+                syncId="summary"
+            >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Bar dataKey="investment" fill="#63acdd" />
+            </BarChart>
             <AreaChart
                 width={320}
                 height={160}
@@ -65,18 +122,6 @@ export function Summary({ boundaries, income, spending, investments, repartition
                 <Area type="monotone" dataKey="income" stroke="#82ca9d" fillOpacity={1} fill="url(#colorIncome)"/>
                 <Area type="monotone" dataKey="spending" stroke="#8884d8" fillOpacity={1} fill="url(#colorSpending)"/>
             </AreaChart>
-            <BarChart
-                width={320}
-                height={160}
-                data={investmentsSummary}
-                syncId="summary"
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="age" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Bar dataKey="investment" fill="#82ca9d" />
-            </BarChart>
             <AreaChart
                 width={320}
                 height={160}

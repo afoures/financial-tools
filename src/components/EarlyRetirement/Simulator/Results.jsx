@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
-
 import { useConfig } from './SimulatorContext'
 
 import style from './Results.module.scss'
 
+import Helper from '../../Helper'
 import * as Charts from './Charts'
 
 // 110 rule -> stock % = 110 - current age
@@ -59,7 +59,13 @@ const computeRepartition = (boundaries, data) => {
     }
     return [...Array(boundaries.years)].map((_, year) => {
         const found = data.find(elem => elem.age === boundaries.min + year)
-        if ( found ) lastRepartition = found.repartition
+        if ( found ) {
+            lastRepartition = {
+                stock: found.stock,
+                bond: found.bond,
+                cash: found.cash,
+            }
+        }
         return lastRepartition
     })
 }
@@ -172,6 +178,7 @@ function Results() {
         income,
         spending,
         investments,
+        savings,
         repartition,
         balance,
         target,
@@ -184,11 +191,20 @@ function Results() {
                 income={income}
                 spending={spending}
                 investments={investments}
+                savings={savings}
                 repartition={repartition}
             />
             <div className={style.main}>
                 <div className={style.informations}>
-                    <p>Target = ({config.goal.amount} / {1 - config.avgTaxRate}) / {config.goal.wr} = {target.toFixed(2)}</p>
+                    <p>
+                        Target
+                        = ({config.goal.amount} / {1 - config.avgTaxRate}) / {config.goal.wr} = {target.toFixed(2)}
+                        <Helper title='Target'>
+                            <p>
+                                Il s'agit du montant que vous devez épargner en vue de votre retraite.
+                            </p>
+                        </Helper>
+                    </p>
                 </div>
                 <Charts.Retirement
                     boundaries={boundaries}
